@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MOSTRADOR - LA TERRACITA</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+    margin:0;
+    padding:20px;
+}
+
+.encabezado{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+h1{
+    margin:0;
+}
+
+.botonesVista{
+    display:flex;
+    gap:10px;
+}
+
+#btnDia{
+    background:#16a34a;
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:12px 20px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#btnTodas{
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:12px 20px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#btnHistorial{
+    background:#7c3aed;
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:12px 20px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#pedidos{
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fill,minmax(140px,1fr));
+    gap:10px;
+}
+
+.botonPedido{
+    height:80px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:16px;
+    padding:10px;
+}
+
+.pendiente{
+    background:#facc15;
+}
+
+.pagada{
+    background:#22c55e;
+    color:white;
+}
+
+.entregada{
+    background:#2563eb;
+    color:white;
+}
+
+.cancelada{
+    background:#dc2626;
+    color:white;
+}
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.modalContenido{
+    background:white;
+    width:500px;
+    max-width:90%;
+    border-radius:12px;
+    padding:20px;
+}
+
+.modalTitulo{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.producto{
+    padding:6px 0;
+    border-bottom:1px solid #ddd;
+}
+
+.total{
+    font-size:22px;
+    font-weight:bold;
+    margin-top:15px;
+}
+
+.acciones{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.btnPagado{
+    background:#16a34a;
+    color:white;
+}
+
+.btnCancelar{
+    background:#dc2626;
+    color:white;
+}
+
+.btnEntregada{
+    background:#2563eb;
+    color:white;
+}
+
+button{
+    border:none;
+    border-radius:8px;
+    padding:12px 18px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="encabezado">
+
+    <h1>MOSTRADOR LA TERRACITA</h1>
+
+   <div class="botonesVista">
+
+    <button id="btnDia">
+        ORDENES DEL DIA
+    </button>
+
+    <button id="btnTodas">
+        TODAS LAS ORDENES
+    </button>
+
+    <button id="btnHistorial">
+        HISTORIAL Y REPORTES
+    </button>
+
+    </div>
+
+</div>
+
+<div id="pedidos"></div>
+
+<div id="modal" class="modal">
+
+    <div
+        id="detallePedido"
+        class="modalContenido">
+    </div>
+
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>La Terracita de los Antojos</title>
+
+<link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <h1>LA TERRACITA DE LOS ANTOJOS</h1>
+
+    <div id="categorias" class="categorias"></div>
+
+    <div id="contenido"></div>
+
+    <h2>COMANDA</h2>
+
+    <div id="comanda"></div>
+
+<div id="pasoFinal" style="display:none;">
+
+    <div class="fila-final">
+
+        <div class="nombre-box">
+
+            <label>ESCRIBE TU NOMBRE</label>
+
+            <input
+                type="text"
+                id="nombreCliente"
+                autocomplete="off"
+            >
+
+        </div>
+
+        <button id="btnEnviar">
+            ENVIAR ORDEN<br>
+            Y PASAR A PAGAR
+        </button>
+
+    </div>
+
+    <p>
+        <strong>IMPORTANTE:</strong><br>
+        LAS ÓRDENES SE PREPARAN EN EL ORDEN EN QUE SON PAGADAS,
+        NO EN EL ORDEN EN QUE SON TERMINADAS.
+    </p>
+
+</div>
+
+    <div class="acciones">
+    <button id="btnTerminar">TERMINÉ MI ORDEN</button>
+    <button id="btnCancelar">CANCELAR ORDEN</button>
+
+    </div>
+
+</div>
+
+<script src="data/menu.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
+

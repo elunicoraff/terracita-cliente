@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+Historial y Reportes
+</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    padding:20px;
+    background:#f5f5f5;
+}
+
+h1{
+    margin-top:0;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+#tabla{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    background:white;
+}
+
+#tabla th{
+    background:#2563eb;
+    color:white;
+    padding:10px;
+}
+
+#tabla td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+}
+
+.PENDIENTE{
+    color:#ca8a04;
+    font-weight:bold;
+}
+
+.PAGADA{
+    color:#16a34a;
+    font-weight:bold;
+}
+
+.ENTREGADA{
+    color:#2563eb;
+    font-weight:bold;
+}
+
+.CANCELADO{
+    color:#dc2626;
+    font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>
+HISTORIAL Y REPORTES
+</h1>
+
+<button
+onclick="window.location.href='/admin/'">
+VOLVER
+</button>
+
+<div id="resumen">
+
+    <h2>RESUMEN DEL DÍA</h2>
+
+    <div id="pendientes">
+        Pendientes: 0
+    </div>
+
+    <div id="pagadas">
+        Pagadas: 0
+    </div>
+
+    <div id="entregadas">
+        Entregadas: 0
+    </div>
+
+    <div id="canceladas">
+        Canceladas: 0
+    </div>
+
+    <br>
+
+    <div
+        id="ventasDia"
+        style="
+        font-size:24px;
+        font-weight:bold;
+        color:#16a34a;
+        "
+    >
+        VENTAS DEL DÍA: $0
+    </div>
+
+<div style="margin-top:20px;">
+
+    <button
+        id="btnReporteDia"
+        onclick="mostrarDia()"
+        style="
+        background:#16a34a;
+        color:white;
+        "
+    >
+        DÍA
+    </button>
+
+    <button
+        id="btnReporteSemana"
+        onclick="mostrarSemana()"
+        style="
+        background:#2563eb;
+        color:white;
+        "
+    >
+        SEMANA
+    </button>
+
+    <button
+        id="btnReporteMes"
+        onclick="mostrarMes()"
+        style="
+        background:#7c3aed;
+        color:white;
+        "
+    >
+        MES
+    </button>
+
+</div>
+
+<div
+    id="detalleReporte"
+    style="
+    margin-top:20px;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    "
+>
+</div>
+
+
+</div>
+
+<br>
+
+<div
+    style="
+    margin-top:20px;
+    margin-bottom:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    "
+>
+
+    <button onclick="filtrarEstado('TODAS')">
+        TODAS
+    </button>
+
+    <button onclick="filtrarEstado('PENDIENTE')">
+        PENDIENTES
+    </button>
+
+    <button onclick="filtrarEstado('PAGADA')">
+        PAGADAS
+    </button>
+
+    <button onclick="filtrarEstado('ENTREGADA')">
+        ENTREGADAS
+    </button>
+
+    <button onclick="filtrarEstado('CANCELADO')">
+        CANCELADAS
+    </button>
+
+</div>
+
+
+<table id="tabla">
+
+<thead>
+
+<tr>
+<th>ORDEN</th>
+<th>FECHA</th>
+<th>HORA</th>
+<th>CLIENTE</th>
+<th>ESTADO</th>
+<th>TOTAL</th>
+</tr>
+
+</thead>
+
+<tbody id="tbodyPedidos">
+</tbody>
+
+</table>
+
+<script>
+
+let pedidosGlobal = [];
+
+let filtroEstado = "TODAS";
+
+async function cargarHistorial(){
+
+    const r =
+        await fetch("/api/pedidos");
+
+    const pedidos =
+        await r.json();
+
+pedidosGlobal = pedidos;
+
+
+let pendientes = 0;
+let pagadas = 0;
+let entregadas = 0;
+let canceladas = 0;
+
+let ventasDia = 0;
+
+const hoy =
+    new Date()
+    .toISOString()
+    .split("T")[0];
+
+    const tbody =
+        document.getElementById(
+            "tbodyPedidos"
+        );
+
+    tbody.innerHTML = "";
+
+pendientes = pedidos.filter(
+    p => p.estado === "PENDIENTE"
+).length;
+
+pagadas = pedidos.filter(
+    p => p.estado === "PAGADA"
+).length;
+
+entregadas = pedidos.filter(
+    p => p.estado === "ENTREGADA"
+).length;
+
+canceladas = pedidos.filter(
+    p => p.estado === "CANCELADO"
+).length;
+
+pedidos
+.slice()
+.reverse()
+.filter(p => {
+
+    if(
+        filtroEstado === "TODAS"
+    ){
+        return true;
+    }
+
+    return (
+        p.estado === filtroEstado
+    );
+
+})
+.forEach(p => {
+   
+    if (
+    (p.estado === "PAGADA" ||
+     p.estado === "ENTREGADA")
+    &&
+    p.fecha === hoy
+) {
+
+    ventasDia += Number(p.total || 0);
+
+}
+
+    tbody.innerHTML += `
+    <tr>
+
+        <td>
+            ${p.numeroOrden || "-"}
+        </td>
+
+        <td>
+            ${p.fecha || "-"}
+        </td>
+
+        <td>
+            ${p.hora || "-"}
+        </td>
+
+        <td>
+            ${p.cliente || "-"}
+        </td>
+
+        <td class="${p.estado}">
+            ${p.estado}
+        </td>
+
+        <td>
+            $${p.total || 0}
+        </td>
+
+    </tr>
+    `;
+
+});
+
+document.getElementById(
+    "pendientes"
+).innerHTML =
+    "Pendientes: " +
+    pendientes;
+
+document.getElementById(
+    "pagadas"
+).innerHTML =
+    "Pagadas: " +
+    pagadas;
+
+document.getElementById(
+    "entregadas"
+).innerHTML =
+    "Entregadas: " +
+    entregadas;
+
+document.getElementById(
+    "canceladas"
+).innerHTML =
+    "Canceladas: " +
+    canceladas;
+
+document.getElementById(
+    "ventasDia"
+).innerHTML =
+    "VENTAS DEL DÍA: $" +
+    ventasDia.toFixed(2);
+
+}
+
+cargarHistorial();
+
+
+function filtrarEstado(
+    estado
+){
+
+    filtroEstado = estado;
+
+    cargarHistorial();
+
+}
+
+function mostrarDia(){
+
+    document.getElementById(
+        "detalleReporte"
+    ).innerHTML = `
+        <h3>VENTA DEL DÍA</h3>
+
+        <div>
+            Total:
+            ${document.getElementById(
+                "ventasDia"
+            ).innerHTML}
+        </div>
+    `;
+}
+
+function mostrarSemana(){
+
+    let lunes = 0;
+    let martes = 0;
+    let miercoles = 0;
+    let jueves = 0;
+    let viernes = 0;
+    let sabado = 0;
+
+    pedidosGlobal.forEach(p => {
+
+        if(
+            p.estado !== "PAGADA" &&
+            p.estado !== "ENTREGADA"
+        ){
+            return;
+        }
+
+        if(!p.fecha){
+            return;
+        }
+
+        const fecha =
+            new Date(p.fecha);
+
+        const dia =
+            fecha.getDay();
+
+        if(dia === 1)
+            lunes += Number(p.total || 0);
+
+        if(dia === 2)
+            martes += Number(p.total || 0);
+
+        if(dia === 3)
+            miercoles += Number(p.total || 0);
+
+        if(dia === 4)
+            jueves += Number(p.total || 0);
+
+        if(dia === 5)
+            viernes += Number(p.total || 0);
+
+        if(dia === 6)
+            sabado += Number(p.total || 0);
+
+    });
+
+    document.getElementById(
+        "detalleReporte"
+    ).innerHTML = `
+
+        <h3>VENTAS DE LA SEMANA</h3>
+
+        <div>Lunes: $${lunes}</div>
+        <div>Martes: $${martes}</div>
+        <div>Miércoles: $${miercoles}</div>
+        <div>Jueves: $${jueves}</div>
+        <div>Viernes: $${viernes}</div>
+        <div>Sábado: $${sabado}</div>
+
+    `;
+}
+
+function mostrarMes(){
+
+    let semana1 = 0;
+    let semana2 = 0;
+    let semana3 = 0;
+    let semana4 = 0;
+    let semana5 = 0;
+
+    const hoy = new Date();
+
+    const mesActual = hoy.getMonth();
+    const anioActual = hoy.getFullYear();
+
+    pedidosGlobal.forEach(p => {
+
+        if(
+            p.estado !== "PAGADA" &&
+            p.estado !== "ENTREGADA"
+        ){
+            return;
+        }
+
+        if(!p.fecha){
+            return;
+        }
+
+        const fecha = new Date(p.fecha);
+
+        if(
+            fecha.getMonth() !== mesActual ||
+            fecha.getFullYear() !== anioActual
+        ){
+            return;
+        }
+
+        const diaMes = fecha.getDate();
+
+        if(diaMes <= 7){
+            semana1 += Number(p.total || 0);
+        }
+        else if(diaMes <= 14){
+            semana2 += Number(p.total || 0);
+        }
+        else if(diaMes <= 21){
+            semana3 += Number(p.total || 0);
+        }
+        else if(diaMes <= 28){
+            semana4 += Number(p.total || 0);
+        }
+        else{
+            semana5 += Number(p.total || 0);
+        }
+
+    });
+
+    document.getElementById(
+        "detalleReporte"
+    ).innerHTML = `
+
+        <h3>VENTAS DEL MES</h3>
+
+        <div>Semana 1: $${semana1}</div>
+        <div>Semana 2: $${semana2}</div>
+        <div>Semana 3: $${semana3}</div>
+        <div>Semana 4: $${semana4}</div>
+        <div>Semana 5: $${semana5}</div>
+
+    `;
+}
+mostrarDia();
+
+
+</script>
+
+</body>
+
+</html>
