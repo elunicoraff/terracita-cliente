@@ -17,50 +17,69 @@
 
     <h1>LA TERRACITA DE LOS ANTOJOS</h1>
 
-    <div id="categorias" class="categorias"></div>
+    <main class="zona-superior">
 
-    <div id="contenido"></div>
+        <div id="categorias" class="categorias"></div>
 
-    <h2>COMANDA</h2>
+        <div id="contenido"></div>
 
-    <div id="comanda"></div>
+    </main>
 
-<div id="pasoFinal" style="display:none;">
+    <section class="pedido-fijo">
 
-    <div class="fila-final">
+        <div id="comanda"></div>
 
-        <div class="nombre-box">
+        <div id="pasoFinal" style="display:none;">
 
-            <label>ESCRIBE TU NOMBRE</label>
+            <div class="fila-final">
 
-            <input
-                type="text"
-                id="nombreCliente"
-                autocomplete="off"
-            >
+                <div class="nombre-box">
+
+                    <label>ESCRIBE TU NOMBRE</label>
+
+                    <input
+                        type="text"
+                        id="nombreCliente"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+                <button id="btnEnviar">
+                    ENVIAR ORDEN<br>
+                    Y PASAR A PAGAR
+                </button>
+
+            </div>
+
+            <p>
+                <strong>IMPORTANTE:</strong><br>
+                LAS ÓRDENES SE PREPARAN EN EL ORDEN EN QUE SON PAGADAS,
+                NO EN EL ORDEN EN QUE SON TERMINADAS.
+            </p>
 
         </div>
 
-        <button id="btnEnviar">
-            ENVIAR ORDEN<br>
-            Y PASAR A PAGAR
-        </button>
+        <div class="acciones">
 
-    </div>
+            <button
+                id="btnContinuar"
+                style="display:none;"
+            >
+                CONTINUAR SELECCIONANDO
+            </button>
 
-    <p>
-        <strong>IMPORTANTE:</strong><br>
-        LAS ÓRDENES SE PREPARAN EN EL ORDEN EN QUE SON PAGADAS,
-        NO EN EL ORDEN EN QUE SON TERMINADAS.
-    </p>
+            <button id="btnTerminar">
+                TERMINÉ MI ORDEN
+            </button>
 
-</div>
+            <button id="btnCancelar">
+                CANCELAR ORDEN
+            </button>
 
-    <div class="acciones">
-    <button id="btnTerminar">TERMINÉ MI ORDEN</button>
-    <button id="btnCancelar">CANCELAR ORDEN</button>
+        </div>
 
-    </div>
+    </section>
 
 </div>
 
@@ -69,4 +88,3 @@
 
 </body>
 </html>
-

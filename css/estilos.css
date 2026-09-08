@@ -1,265 +1,337 @@
 body{
-    font-family: Arial, Helvetica, sans-serif;
-    background:#f2f2f2;
-    margin:0;
-    padding:20px;
+font-family: Arial, Helvetica, sans-serif;
+background:#f2f2f2;
+margin:0;
+padding:20px;
 }
 
 .contenedor{
-    max-width:900px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:12px;
+max-width:480px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:12px;
+box-sizing:border-box;
+height:calc(100dvh - 40px);
+display:flex;
+flex-direction:column;
 }
 
-h1,h2{
-    text-align:center;
+/* TITULO MÁS PEQUEÑO Y EN UNA SOLA LÍNEA */
+
+h1{
+text-align:center;
+font-size:18px;
+margin:0 0 12px 0;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+h2{
+text-align:center;
+}
+
+.zona-superior{
+flex:1;
+min-height:0;
+overflow-y:auto;
+padding:0 2px 12px;
+}
+
+.pedido-fijo{
+flex-shrink:0;
+border-top:2px solid #ddd;
+background:white;
+padding-top:12px;
+margin-top:10px;
 }
 
 /* =========================
-   CATEGORÍAS
+CATEGORÍAS
 ========================= */
 
 .categorias{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:15px;
-    margin-bottom:20px;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+margin-bottom:20px;
 }
 
 .categoria-btn{
-    min-height:180px;
-    border:none;
-    border-radius:18px;
-    color:white;
-    font-size:26px;
-    font-weight:bold;
-    cursor:pointer;
+min-height:90px;
+border:none;
+border-radius:18px;
+color:white;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
 
-    box-shadow:0 4px 10px rgba(0,0,0,.20);
-    transition:0.2s;
+box-shadow:0 4px 10px rgba(0,0,0,.20);
+transition:0.2s;
 
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
 
-    display:flex;
-    align-items:flex-end;
-    justify-content:center;
+display:flex;
+align-items:flex-end;
+justify-content:center;
 
-    padding:15px;
+padding:15px;
 
-    text-shadow:
-        2px 2px 4px rgba(0,0,0,.90);
+text-shadow:
+2px 2px 4px rgba(0,0,0,.90);
 
-    overflow:hidden;
+overflow:hidden;
 }
 
 .categoria-btn:hover{
-    transform:scale(1.02);
+transform:scale(1.02);
 }
 
 /* BANDERILLAS */
 
 .categoria-btn:nth-child(1){
-    background-image:
-    linear-gradient(
-        rgba(0,0,0,.25),
-        rgba(0,0,0,.55)
-    ),
-    url("../img/banderillas-coreanas.jpg");
+background-image:
+linear-gradient(
+rgba(0,0,0,.25),
+rgba(0,0,0,.55)
+),
+url("../img/banderillas-coreanas.jpg");
 }
 
 /* SNACKS */
 
 .categoria-btn:nth-child(2){
-    background-image:
-    linear-gradient(
-        rgba(0,0,0,.25),
-        rgba(0,0,0,.55)
-    ),
-    url("../img/snacks.jpg");
+background-image:
+linear-gradient(
+rgba(0,0,0,.25),
+rgba(0,0,0,.55)
+),
+url("../img/snacks.jpg");
 }
 
 /* POSTRES */
 
 .categoria-btn:nth-child(3){
-    background-image:
-    linear-gradient(
-        rgba(0,0,0,.25),
-        rgba(0,0,0,.55)
-    ),
-    url("../img/postres.jpg");
+background-image:
+linear-gradient(
+rgba(0,0,0,.25),
+rgba(0,0,0,.55)
+),
+url("../img/postres.jpg");
 }
 
 /* SODAS */
 
 .categoria-btn:nth-child(4){
-    background-image:
-    linear-gradient(
-        rgba(0,0,0,.25),
-        rgba(0,0,0,.55)
-    ),
-    url("../img/sodas-italianas.jpg");
+background-image:
+linear-gradient(
+rgba(0,0,0,.25),
+rgba(0,0,0,.55)
+),
+url("../img/sodas-italianas.jpg");
 }
 
 /* =========================
-   BOTONES GENERALES
+BOTONES GENERALES
 ========================= */
 
 button{
-    padding:14px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
+padding:14px;
+border:none;
+border-radius:8px;
+cursor:pointer;
 }
 
 /* =========================
-   OPCIONES DE PRODUCTOS
+OPCIONES DE PRODUCTOS
 ========================= */
 
 .opcion{
-    display:block;
-    width:100%;
-    margin-top:10px;
+display:block;
+width:100%;
+margin-top:8px;
 
-    font-size:20px;
-    font-weight:bold;
+font-size:17px;
+font-weight:bold;
 
-    background:#eeeeee;
+background:#eeeeee;
 
-    padding:18px;
+padding:12px;
 
-    border-radius:12px;
+border-radius:10px;
 }
 
 .opcion:hover{
-    background:#dddddd;
+background:#dddddd;
+}
+
+.opcion-regresar{
+background:#5f6368;
+color:white;
+margin-top:12px;
+}
+
+.opcion-regresar:hover{
+background:#45484c;
 }
 
 /* =========================
-   COMANDA
+COMANDA
 ========================= */
 
 #comanda{
-    border:1px solid #ddd;
-    min-height:100px;
-    padding:10px;
-    margin-top:15px;
-    border-radius:8px;
-    background:white;
+border:1px solid #ddd;
+min-height:140px;
+max-height:180px;
+overflow-y:auto;
+padding:10px;
+margin-top:15px;
+border-radius:8px;
+background:white;
 }
 
 .producto-comanda{
-    padding:8px;
-    border-bottom:1px solid #ddd;
+padding:8px;
+border-bottom:1px solid #ddd;
 }
 
 /* =========================
-   NOMBRE + ENVIAR
+NOMBRE + ENVIAR
 ========================= */
 
 .fila-final{
-    display:flex;
-    gap:15px;
-    align-items:flex-end;
-    margin-top:15px;
+display:flex;
+gap:15px;
+align-items:flex-end;
+margin-top:15px;
 }
 
 .nombre-box{
-    flex:1;
+flex:1 1 auto;
+min-width:0;
 }
 
 .nombre-box label{
-    display:block;
-    margin-bottom:8px;
-    font-weight:bold;
-    font-size:18px;
+display:block;
+margin-bottom:8px;
+font-weight:bold;
+font-size:18px;
 }
 
 #nombreCliente{
-    width:100%;
-    font-size:30px;
-    font-weight:bold;
-    text-transform:uppercase;
+width:100%;
+font-size:26px;
+font-weight:bold;
+text-transform:uppercase;
 
-    padding:14px;
+padding:14px;
 
-    box-sizing:border-box;
+box-sizing:border-box;
 
-    border:2px solid #ddd;
-    border-radius:8px;
+border:2px solid #ddd;
+border-radius:8px;
 }
 
 /* =========================
-   BOTONES PRINCIPALES
+BOTONES PRINCIPALES
 ========================= */
 
 #btnEnviar{
-    width:280px;
+width:180px;
 
-    min-height:80px;
+min-height:65px;
 
-    background:#28a745;
+background:#28a745;
 
-    color:white;
+color:white;
 
-    font-size:18px;
+font-size:14px;
 
-    font-weight:bold;
+font-weight:bold;
+
+line-height:1.2;
 }
+
+/* TERMINÉ MI ORDEN = VERDE */
 
 #btnTerminar{
-    background:#ff9800;
-    color:white;
-    font-weight:bold;
-    font-size:18px;
+background:#28a745;
+color:white;
+font-weight:bold;
+font-size:18px;
 }
 
+/* CANCELAR = ROJO */
+
 #btnCancelar{
-    background:#d32f2f;
-    color:white;
-    font-weight:bold;
-    font-size:18px;
+background:#d32f2f;
+color:white;
+font-weight:bold;
+font-size:18px;
+}
+
+/* CONTINUAR SELECCIONANDO = AMARILLO */
+
+#btnContinuar{
+background:#ffc107;
+color:#000;
+font-weight:bold;
+font-size:18px;
 }
 
 /* =========================
-   ACCIONES
+ACCIONES
 ========================= */
 
 .acciones{
-    margin-top:20px;
-    display:flex;
-    gap:10px;
+margin-top:20px;
+display:flex;
+gap:10px;
 }
 
 .acciones button{
-    flex:1;
-    min-height:60px;
+flex:1;
+min-height:60px;
 }
 
 /* =========================
-   RESPONSIVE CELULAR
+RESPONSIVE CELULAR
 ========================= */
 
 @media(max-width:700px){
 
-    .categorias{
-        grid-template-columns:1fr;
-    }
+body{
+padding:0;
+}
 
-    .categoria-btn{
-        min-height:160px;
-        font-size:22px;
-    }
+.contenedor{
+height:100dvh;
+border-radius:0;
+padding:14px;
+}
 
-    .fila-final{
-        flex-direction:column;
-    }
+.categorias{
+grid-template-columns:repeat(2,1fr);
+}
 
-    #btnEnviar{
-        width:100%;
-    }
+.categoria-btn{
+min-height:120px;
+font-size:18px;
+}
 
+.fila-final{
+flex-direction:row;
+align-items:flex-end;
+}
+
+#btnEnviar{
+width:180px;
+}
+
+h1{
+font-size:16px;
+}
 }
