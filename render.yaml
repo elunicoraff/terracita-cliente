@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: terracita-clientes
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PUBLIC_ORDERING_ONLY
+        value: "true"
+      - key: BRIDGE_TOKEN
+        generateValue: true
