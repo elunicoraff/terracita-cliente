@@ -21,6 +21,16 @@ cubiertas:[
 ]
 },
 
+buldak:{
+nombre:"BULDAK",
+productos:[
+
+{nombre:"BULDAK ATASCADA",precio:145},
+{nombre:"MONCHI LOCA",precio:145}
+
+]
+},
+
 snacks:{
 nombre:"SNACKS",
 
