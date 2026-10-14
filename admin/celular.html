@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>MOSTRADOR MÓVIL - LA TERRACITA</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f5f5f5;
+            color: #111827;
+            font-family: Arial, sans-serif;
+            padding: 14px;
+        }
+        .encabezado {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        h1 { margin: 0; font-size: 22px; }
+        .encabezado strong { color: #475569; font-size: 13px; text-align: right; }
+        #pedidos {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            padding-bottom: 20px;
+        }
+        .botonPedido {
+            min-height: 88px;
+            border: 0;
+            border-radius: 12px;
+            padding: 10px 6px;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.15;
+            overflow-wrap: anywhere;
+        }
+        .pendiente { background: #facc15; color: #1f2937; }
+        .pagada, .entregada { background: #2563eb; color: #fff; }
+        .cancelada { background: #dc2626; color: #fff; }
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 5;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            background: rgba(0, 0, 0, .58);
+        }
+        .modalContenido {
+            width: 100%;
+            max-height: 88vh;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 18px 18px 0 0;
+            padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+        }
+        .modalTitulo { margin-bottom: 13px; font-size: 24px; font-weight: bold; }
+        .producto { padding: 9px 0; border-bottom: 1px solid #e5e7eb; font-size: 16px; }
+        .total { margin-top: 16px; font-size: 24px; font-weight: bold; }
+        .acciones, .herramientasOrden {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 18px;
+        }
+        button {
+            min-height: 48px;
+            border: 0;
+            border-radius: 9px;
+            padding: 10px 14px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btnPagado { background: #16a34a; color: #fff; }
+        .btnCancelar, .btnEliminarArticulo { background: #dc2626; color: #fff; }
+        .btnEntregada { background: #2563eb; color: #fff; }
+        .btnArticulo { min-height: 38px; padding: 7px 9px; background: #475569; color: #fff; font-size: 11px; }
+        .selectorArticulos {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .selectorArticulos button { text-align: left; }
+        .btnRegresarEditor { background: #64748b; color: #fff; margin-top: 14px; }
+        #efectivoRecibido { max-width: 100%; }
+        @media (min-width: 620px) {
+            body { max-width: 760px; margin: auto; }
+            #pedidos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .modal { align-items: center; }
+            .modalContenido { width: 560px; border-radius: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="encabezado">
+        <h1>MOSTRADOR MÓVIL</h1>
+        <strong>ÓRDENES<br>DEL DÍA</strong>
+    </div>
+
+    <div id="pedidos"></div>
+
+    <div id="modal" class="modal">
+        <div id="detallePedido" class="modalContenido"></div>
+    </div>
+
+    <script src="/data/menu.js"></script>
+    <script src="/admin/admin.js"></script>
+</body>
+</html>
