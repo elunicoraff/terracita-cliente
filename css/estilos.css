@@ -101,9 +101,20 @@ rgba(0,0,0,.55)
 url("../img/banderillas-coreanas.jpg");
 }
 
-/* SNACKS */
+/* BULDAK */
 
 .categoria-btn:nth-child(2){
+background-image:
+linear-gradient(
+rgba(0,0,0,.12),
+rgba(0,0,0,.30)
+),
+url("../img/buldak.jpg");
+}
+
+/* SNACKS */
+
+.categoria-btn:nth-child(3){
 background-image:
 linear-gradient(
 rgba(0,0,0,.25),
@@ -114,7 +125,7 @@ url("../img/snacks.jpg");
 
 /* POSTRES */
 
-.categoria-btn:nth-child(3){
+.categoria-btn:nth-child(4){
 background-image:
 linear-gradient(
 rgba(0,0,0,.25),
@@ -125,7 +136,7 @@ url("../img/postres.jpg");
 
 /* SODAS */
 
-.categoria-btn:nth-child(4){
+.categoria-btn:nth-child(5){
 background-image:
 linear-gradient(
 rgba(0,0,0,.25),
@@ -196,6 +207,39 @@ background:white;
 .producto-comanda{
 padding:8px;
 border-bottom:1px solid #ddd;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+}
+
+.cantidad-comanda{
+display:flex;
+align-items:center;
+gap:7px;
+white-space:nowrap;
+}
+
+.cantidad-comanda strong{
+min-width:20px;
+text-align:center;
+}
+
+.boton-cantidad{
+width:27px;
+height:27px;
+border:0;
+border-radius:5px;
+background:#1bab4b;
+color:white;
+font-size:21px;
+font-weight:bold;
+line-height:1;
+cursor:pointer;
+}
+
+.boton-cantidad.restar-cantidad{
+background:#555;
 }
 
 /* =========================
