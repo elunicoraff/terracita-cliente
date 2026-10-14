@@ -3,6 +3,28 @@ const contenidoDiv = document.getElementById("contenido");
 const comandaDiv = document.getElementById("comanda");
 
 let comanda = [];
+let noDisponibles = new Set();
+
+function estaNoDisponible(id) {
+    return noDisponibles.has(id)
+        || (id.startsWith("boneless:tamaño:") && noDisponibles.has("producto:snacks:BONELESS"))
+        || (id.startsWith("kbites:variante:") && noDisponibles.has("producto:snacks:K BITES"));
+}
+
+function aplicarDisponibilidad(boton, id) {
+    if (!estaNoDisponible(id)) return false;
+    boton.disabled = true;
+    boton.style.background = "#dc2626";
+    boton.style.color = "white";
+    boton.style.cursor = "not-allowed";
+    boton.textContent += " — NO DISPONIBLE";
+    return true;
+}
+
+fetch("/api/disponibilidad")
+    .then((respuesta) => respuesta.ok ? respuesta.json() : { noDisponibles: [] })
+    .then((datos) => { noDisponibles = new Set(datos.noDisponibles || []); })
+    .catch(() => {});
 
 function mostrarCategorias() {
     categoriasDiv.style.display = "grid";
@@ -52,6 +74,7 @@ function mostrarCategoria(categoria) {
 
         btn.className = "opcion";
         btn.textContent = textoConPrecio(prod);
+        aplicarDisponibilidad(btn, `producto:${categoria}:${prod.nombre}`);
 
         btn.onclick = () =>
             seleccionarProducto(categoria, prod);
@@ -130,6 +153,7 @@ function mostrarCubiertas(producto) {
 
         btn.className = "opcion";
         btn.textContent = textoConPrecio(cubierta);
+        aplicarDisponibilidad(btn, `cubierta:${cubierta.nombre}`);
 
         btn.onclick = () => {
 
@@ -195,6 +219,7 @@ function mostrarBoneless(producto) {
 
         btn.className = "opcion";
         btn.textContent = textoConPrecio(tam);
+        aplicarDisponibilidad(btn, `boneless:tamaño:${tam.nombre}`);
 
         btn.onclick = () =>
             mostrarSalsaBoneless(producto, tam);
@@ -227,6 +252,7 @@ function mostrarSalsaBoneless(
 
         btn.className = "opcion";
         btn.textContent = salsa;
+        aplicarDisponibilidad(btn, `boneless:salsa:${salsa}`);
 
         btn.onclick = () => {
 
@@ -268,6 +294,7 @@ function mostrarPapas(producto) {
 
         btn.textContent =
             textoConPrecio(variante);
+        aplicarDisponibilidad(btn, `papas:variante:${variante.nombre}`);
 
         btn.onclick = () => {
 
@@ -307,6 +334,7 @@ function mostrarKBites(producto) {
 
         btn.textContent =
             textoConPrecio(variante);
+        aplicarDisponibilidad(btn, `kbites:variante:${variante.nombre}`);
 
         btn.onclick = () =>
             mostrarCubiertasKBites(
@@ -338,6 +366,7 @@ function mostrarCubiertasKBites(
 
             btn.textContent =
                 textoConPrecio(cubierta);
+            aplicarDisponibilidad(btn, `cubierta:${cubierta.nombre}`);
 
             btn.onclick = () => {
 
@@ -418,6 +447,7 @@ function mostrarPerlas(producto) {
 
         btn.textContent =
             textoConPrecio(perla);
+        if (perla.nombre !== "SIN PERLAS") aplicarDisponibilidad(btn, `perla:${perla.nombre}`);
 
         btn.onclick = () => {
 
@@ -460,20 +490,48 @@ function agregarProducto(producto) {
     }, 450);
 }
 
+function claveDeArticulo(item) {
+    return JSON.stringify(item);
+}
+
+function ajustarCantidadArticulo(clave, cambio) {
+    const indice = comanda.findIndex(item => claveDeArticulo(item) === clave);
+    if (indice === -1) return;
+
+    if (cambio > 0) {
+        comanda.push({ ...comanda[indice] });
+    } else {
+        comanda.splice(indice, 1);
+    }
+
+    renderComanda();
+}
+
 function renderComanda() {
 
     let html = "";
     let total = 0;
+    const agrupados = new Map();
 
     comanda.forEach(item => {
+        const clave = claveDeArticulo(item);
+        const grupo = agrupados.get(clave) || { item, cantidad: 0 };
+        grupo.cantidad++;
+        agrupados.set(clave, grupo);
+        total += Number(item.precio || 0);
+    });
 
+    agrupados.forEach(({ item, cantidad }, clave) => {
         html += `
             <div class="producto-comanda">
-                ${item.nombre} - $${item.precio}
+                <span>${item.nombre} - $${item.precio}</span>
+                <div class="cantidad-comanda" aria-label="Cantidad de ${item.nombre}">
+                    <button type="button" class="boton-cantidad restar-cantidad" data-clave="${encodeURIComponent(clave)}" aria-label="Quitar uno">−</button>
+                    <strong>${cantidad}</strong>
+                    <button type="button" class="boton-cantidad sumar-cantidad" data-clave="${encodeURIComponent(clave)}" aria-label="Agregar otro">+</button>
+                </div>
             </div>
         `;
-
-        total += Number(item.precio || 0);
     });
 
     if (comanda.length === 0) {
@@ -488,6 +546,13 @@ function renderComanda() {
     html += `<h3>TOTAL: $${total}</h3>`;
 
     comandaDiv.innerHTML = html;
+
+    comandaDiv.querySelectorAll(".sumar-cantidad").forEach(boton => {
+        boton.onclick = () => ajustarCantidadArticulo(decodeURIComponent(boton.dataset.clave), 1);
+    });
+    comandaDiv.querySelectorAll(".restar-cantidad").forEach(boton => {
+        boton.onclick = () => ajustarCantidadArticulo(decodeURIComponent(boton.dataset.clave), -1);
+    });
 }
 
 const btnTerminar =
