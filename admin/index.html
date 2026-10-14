@@ -29,41 +29,6 @@ h1{
     margin:0;
 }
 
-.botonesVista{
-    display:flex;
-    gap:10px;
-}
-
-#btnDia{
-    background:#16a34a;
-    color:white;
-    border:none;
-    border-radius:8px;
-    padding:12px 20px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-#btnTodas{
-    background:#2563eb;
-    color:white;
-    border:none;
-    border-radius:8px;
-    padding:12px 20px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-#btnHistorial{
-    background:#7c3aed;
-    color:white;
-    border:none;
-    border-radius:8px;
-    padding:12px 20px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
 #pedidos{
     display:grid;
     grid-template-columns:
@@ -86,7 +51,7 @@ h1{
 }
 
 .pagada{
-    background:#22c55e;
+    background:#2563eb;
     color:white;
 }
 
@@ -113,6 +78,8 @@ h1{
     background:white;
     width:500px;
     max-width:90%;
+    max-height:85vh;
+    overflow-y:auto;
     border-radius:12px;
     padding:20px;
 }
@@ -156,6 +123,41 @@ h1{
     color:white;
 }
 
+.herramientasOrden{
+    display:flex;
+    gap:6px;
+    margin:12px 0;
+    flex-wrap:wrap;
+}
+
+.btnArticulo{
+    padding:6px 8px;
+    font-size:11px;
+    background:#475569;
+    color:white;
+}
+
+.btnEliminarArticulo{
+    background:#b91c1c;
+}
+
+.selectorArticulos{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:8px;
+    margin-top:15px;
+}
+
+.selectorArticulos button{
+    text-align:left;
+}
+
+.btnRegresarEditor{
+    margin-top:14px;
+    background:#64748b;
+    color:white;
+}
+
 button{
     border:none;
     border-radius:8px;
@@ -174,21 +176,7 @@ button{
 
     <h1>MOSTRADOR LA TERRACITA</h1>
 
-   <div class="botonesVista">
-
-    <button id="btnDia">
-        ORDENES DEL DIA
-    </button>
-
-    <button id="btnTodas">
-        TODAS LAS ORDENES
-    </button>
-
-    <button id="btnHistorial">
-        HISTORIAL Y REPORTES
-    </button>
-
-    </div>
+    <div><strong>ÓRDENES DEL DÍA</strong></div>
 
 </div>
 
@@ -203,6 +191,7 @@ button{
 
 </div>
 
+<script src="/data/menu.js"></script>
 <script src="admin.js"></script>
 
 </body>

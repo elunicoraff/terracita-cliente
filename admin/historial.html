@@ -8,9 +8,7 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>
-Historial y Reportes
-</title>
+<title>CONTROL - LA TERRACITA</title>
 
 <style>
 
@@ -31,6 +29,25 @@ button{
     cursor:pointer;
     font-weight:bold;
 }
+
+#btnVolver{
+    background:#facc15;
+    color:#111827;
+}
+
+#btnSalir{
+    background:#dc2626;
+    color:white;
+    margin-left:8px;
+}
+
+#btnNoDisponibles{ background:#991b1b; color:white; margin-left:8px; }
+#panelNoDisponibles{ display:none; margin:20px 0; background:white; padding:18px; border-radius:10px; }
+.grupoNoDisponible{ margin:18px 0; }
+.grupoNoDisponible h3{ margin:0 0 8px; }
+.listaNoDisponibles{ display:flex; flex-wrap:wrap; gap:8px; }
+.opcionDisponible{ background:#e5e7eb; color:#111827; }
+.opcionNoDisponible{ background:#dc2626; color:white; }
 
 #tabla{
     width:100%;
@@ -70,20 +87,82 @@ button{
     font-weight:bold;
 }
 
+.tablaReporte{
+    width:100%;
+    max-width:480px;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+.tablaReporte th,
+.tablaReporte td{
+    padding:8px 10px;
+    border-bottom:1px solid #ddd;
+}
+
+.tablaReporte th{
+    text-align:left;
+}
+
+.tablaReporte td{
+    text-align:right;
+    font-weight:bold;
+}
+
+.barraReportes{
+    margin-top:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.grupoBotonesReporte{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.btnPeriodoAnterior{
+    background:#ea580c;
+    color:white;
+}
+
+.btnCancelarControl{
+    padding:7px 10px;
+    font-size:12px;
+    background:#dc2626;
+    color:white;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<h1>
-HISTORIAL Y REPORTES
-</h1>
+<h1>CONTROL DE VENTAS LA TERRACITA</h1>
 
 <button
+id="btnVolver"
 onclick="window.location.href='/admin/'">
-VOLVER
+MOSTRADOR
 </button>
+
+<button id="btnSalir" onclick="cerrarSesionControl()">
+SALIR DE CONTROL
+</button>
+
+<button id="btnNoDisponibles" onclick="mostrarNoDisponibles()">
+NO DISPONIBLES
+</button>
+
+<section id="panelNoDisponibles">
+    <h2>PRODUCTOS NO DISPONIBLES</h2>
+    <p>Presiona una opción para deshabilitarla o volverla a habilitar. Rojo significa no disponible.</p>
+    <div id="listaNoDisponibles"></div>
+</section>
 
 <div id="resumen">
 
@@ -118,7 +197,9 @@ VOLVER
         VENTAS DEL DÍA: $0
     </div>
 
-<div style="margin-top:20px;">
+<div class="barraReportes">
+
+    <div class="grupoBotonesReporte">
 
     <button
         id="btnReporteDia"
@@ -128,7 +209,7 @@ VOLVER
         color:white;
         "
     >
-        DÍA
+        HOY
     </button>
 
     <button
@@ -139,7 +220,7 @@ VOLVER
         color:white;
         "
     >
-        SEMANA
+        SEMANA ACTUAL
     </button>
 
     <button
@@ -150,8 +231,28 @@ VOLVER
         color:white;
         "
     >
-        MES
+        MES ACTUAL
     </button>
+
+    </div>
+
+    <div class="grupoBotonesReporte">
+
+        <button
+            class="btnPeriodoAnterior"
+            onclick="mostrarSemanaAnterior()"
+        >
+            SEMANA ANTERIOR
+        </button>
+
+        <button
+            class="btnPeriodoAnterior"
+            onclick="mostrarMesAnterior()"
+        >
+            MES ANTERIOR
+        </button>
+
+    </div>
 
 </div>
 
@@ -229,11 +330,178 @@ VOLVER
 let pedidosGlobal = [];
 
 let filtroEstado = "TODAS";
+let noDisponibles = new Set();
+
+const catalogoNoDisponibles = [
+    ["BANDERILLAS", [
+        ["producto:banderillas:LA CLASICA", "La Clásica"], ["producto:banderillas:LA ANTOJADIZA", "La Antojadiza"],
+        ["producto:banderillas:LA CHEESE MONSTER", "La Cheese Monster"], ["producto:banderillas:LA ITALIANA", "La Italiana"]
+    ]],
+    ["CUBIERTAS", [
+        ["cubierta:FLAMMIN HOT", "Flammin Hot"], ["cubierta:RUFFLES", "Ruffles"], ["cubierta:DORITOS", "Doritos"],
+        ["cubierta:PAPA EN CUBITOS", "Papa en cubitos"], ["cubierta:BONELESS", "Boneless"]
+    ]],
+    ["BONELESS", [
+        ["producto:snacks:BONELESS", "Boneless (todo)"], ["boneless:tamaño:180 GRAMOS", "180 gramos"],
+        ["boneless:tamaño:250 GRAMOS", "250 gramos"], ["boneless:salsa:BBQ PICANTE", "BBQ picante"],
+        ["boneless:salsa:BUFFALO", "Buffalo"], ["boneless:salsa:MANGO HABANERO", "Mango habanero"],
+        ["boneless:salsa:NATURALES", "Naturales"]
+    ]],
+    ["SNACKS", [
+        ["papas:variante:CLASICAS", "Papas clásicas"], ["papas:variante:QUESO CHEDDAR", "Papas queso cheddar"],
+        ["producto:snacks:K BITES", "K Bites (todo)"], ["kbites:variante:SALCHICHA", "K Bites salchicha"],
+        ["kbites:variante:QUESO", "K Bites queso"], ["producto:snacks:NACHOS CON QUESO", "Nachos con queso"]
+    ]],
+    ["POSTRES", [
+        ["producto:postres:CHEESECAKE TORTUGA", "Cheesecake tortuga"], ["producto:postres:CHEESECAKE DE FRAMBUESA", "Cheesecake de frambuesa"],
+        ["producto:postres:GALLETA DE CHISPAS", "Galleta de chispas"], ["producto:postres:PASTEL MATILDA DE CHOCOLATE", "Pastel Matilda"]
+    ]],
+    ["SODAS ITALIANAS", [
+        ["producto:sodas:MANZANA VERDE", "Manzana verde"], ["producto:sodas:MORA AZUL", "Mora azul"],
+        ["producto:sodas:MARACUYA", "Maracuyá"], ["producto:sodas:MANGO", "Mango"],
+        ["producto:sodas:PITAYA", "Pitaya"], ["producto:sodas:FRESA", "Fresa"]
+    ]],
+    ["PERLAS", [
+        ["perla:MORA AZUL", "Mora azul"], ["perla:FRESA", "Fresa"], ["perla:LICHEE", "Lichee"],
+        ["perla:MANGO", "Mango"], ["perla:MANZANA VERDE", "Manzana verde"]
+    ]]
+];
+
+function bloqueadoPorPadre(id){
+    return noDisponibles.has(id)
+        || (id.startsWith("boneless:tamaño:") && noDisponibles.has("producto:snacks:BONELESS"))
+        || (id.startsWith("kbites:variante:") && noDisponibles.has("producto:snacks:K BITES"));
+}
+
+async function mostrarNoDisponibles(){
+    const panel = document.getElementById("panelNoDisponibles");
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
+    if(panel.style.display === "block"){
+        const respuesta = await fetch("/api/control/no-disponibles");
+        if(respuesta.status === 401){ window.location.href = "/control/acceso"; return; }
+        noDisponibles = new Set((await respuesta.json()).noDisponibles || []);
+        renderNoDisponibles();
+    }
+}
+
+function renderNoDisponibles(){
+    document.getElementById("listaNoDisponibles").innerHTML = catalogoNoDisponibles.map(([titulo, opciones]) => `
+        <section class="grupoNoDisponible"><h3>${titulo}</h3><div class="listaNoDisponibles">
+            ${opciones.map(([id, etiqueta]) => `<button class="${bloqueadoPorPadre(id) ? "opcionNoDisponible" : "opcionDisponible"}" data-no-disponible="${id}">${etiqueta}</button>`).join("")}
+        </div></section>
+    `).join("");
+    document.querySelectorAll("[data-no-disponible]").forEach((boton) => {
+        boton.onclick = () => cambiarDisponibilidad(boton.dataset.noDisponible);
+    });
+}
+
+async function cambiarDisponibilidad(id){
+    const respuesta = await fetch("/api/control/no-disponibles", {
+        method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ id })
+    });
+    const datos = await respuesta.json();
+    if(!datos.ok){ alert(datos.error || "No fue posible actualizar la disponibilidad."); return; }
+    noDisponibles = new Set(datos.noDisponibles || []);
+    renderNoDisponibles();
+}
+
+function fechaActualLocal(){
+    const fecha = new Date();
+    return [
+        fecha.getFullYear(),
+        String(fecha.getMonth() + 1).padStart(2, "0"),
+        String(fecha.getDate()).padStart(2, "0")
+    ].join("-");
+}
+
+function fechaLocalDesdeISO(fechaISO){
+    const partes = String(fechaISO || "").slice(0, 10).split("-").map(Number);
+
+    if(partes.length !== 3 || partes.some(Number.isNaN)){
+        return null;
+    }
+
+    // Se construye en hora local: YYYY-MM-DD en UTC podía desplazar un día.
+    return new Date(partes[0], partes[1] - 1, partes[2], 12);
+}
+
+const nombresDias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+function fechaClave(fecha){
+    return [
+        fecha.getFullYear(),
+        String(fecha.getMonth() + 1).padStart(2, "0"),
+        String(fecha.getDate()).padStart(2, "0")
+    ].join("-");
+}
+
+function esVentaReal(pedido){
+    return pedido.estado === "PAGADA" || pedido.estado === "ENTREGADA";
+}
+
+function dinero(importe){
+    return `$${Number(importe || 0).toFixed(2)}`;
+}
+
+function inicioSemana(fecha){
+    const inicio = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), 12);
+    const ajuste = (inicio.getDay() + 6) % 7; // Lunes = 0
+    inicio.setDate(inicio.getDate() - ajuste);
+    return inicio;
+}
+
+function numeroSemanaISO(fecha){
+    const utc = new Date(Date.UTC(fecha.getFullYear(), fecha.getMonth(), fecha.getDate()));
+    const dia = utc.getUTCDay() || 7;
+    utc.setUTCDate(utc.getUTCDate() + 4 - dia);
+    const inicioAnio = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
+    return Math.ceil((((utc - inicioAnio) / 86400000) + 1) / 7);
+}
+
+function totalDeFecha(claveFecha){
+    return pedidosGlobal
+        .filter((pedido) => esVentaReal(pedido) && pedido.fecha === claveFecha)
+        .reduce((total, pedido) => total + Number(pedido.total || 0), 0);
+}
+
+function datosSemana(fechaReferencia = new Date()){
+    const lunes = inicioSemana(fechaReferencia);
+    const dias = [];
+
+    // La operación cuenta de lunes a sábado; domingo no forma parte del reporte.
+    for(let indice = 0; indice < 6; indice++){
+        const fecha = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() + indice, 12);
+        dias.push({
+            fecha,
+            nombre: nombresDias[fecha.getDay()],
+            total: totalDeFecha(fechaClave(fecha))
+        });
+    }
+
+    return {
+        numero: numeroSemanaISO(lunes),
+        anio: lunes.getFullYear(),
+        inicio: lunes,
+        fin: dias.at(-1).fecha,
+        dias,
+        total: dias.reduce((suma, dia) => suma + dia.total, 0)
+    };
+}
+
+function etiquetaFecha(fecha){
+    return `${String(fecha.getDate()).padStart(2, "0")} ${nombresMeses[fecha.getMonth()].slice(0, 3)}`;
+}
 
 async function cargarHistorial(){
 
     const r =
         await fetch("/api/pedidos");
+
+    if(r.status === 401){
+        window.location.href = "/control/acceso";
+        return;
+    }
 
     const pedidos =
         await r.json();
@@ -248,10 +516,7 @@ let canceladas = 0;
 
 let ventasDia = 0;
 
-const hoy =
-    new Date()
-    .toISOString()
-    .split("T")[0];
+const hoy = fechaActualLocal();
 
     const tbody =
         document.getElementById(
@@ -276,6 +541,10 @@ canceladas = pedidos.filter(
     p => p.estado === "CANCELADO"
 ).length;
 
+ventasDia = pedidos
+    .filter((pedido) => esVentaReal(pedido) && pedido.fecha === hoy)
+    .reduce((total, pedido) => total + Number(pedido.total || 0), 0);
+
 pedidos
 .slice()
 .reverse()
@@ -294,17 +563,6 @@ pedidos
 })
 .forEach(p => {
    
-    if (
-    (p.estado === "PAGADA" ||
-     p.estado === "ENTREGADA")
-    &&
-    p.fecha === hoy
-) {
-
-    ventasDia += Number(p.total || 0);
-
-}
-
     tbody.innerHTML += `
     <tr>
 
@@ -382,154 +640,158 @@ function filtrarEstado(
 
 }
 
+async function cerrarSesionControl(){
+    await fetch("/control/salir", { method:"POST" });
+    window.location.href = "/control/acceso";
+}
+
 function mostrarDia(){
-
-    document.getElementById(
-        "detalleReporte"
-    ).innerHTML = `
-        <h3>VENTA DEL DÍA</h3>
-
-        <div>
-            Total:
-            ${document.getElementById(
-                "ventasDia"
-            ).innerHTML}
-        </div>
-    `;
-}
-
-function mostrarSemana(){
-
-    let lunes = 0;
-    let martes = 0;
-    let miercoles = 0;
-    let jueves = 0;
-    let viernes = 0;
-    let sabado = 0;
-
-    pedidosGlobal.forEach(p => {
-
-        if(
-            p.estado !== "PAGADA" &&
-            p.estado !== "ENTREGADA"
-        ){
-            return;
-        }
-
-        if(!p.fecha){
-            return;
-        }
-
-        const fecha =
-            new Date(p.fecha);
-
-        const dia =
-            fecha.getDay();
-
-        if(dia === 1)
-            lunes += Number(p.total || 0);
-
-        if(dia === 2)
-            martes += Number(p.total || 0);
-
-        if(dia === 3)
-            miercoles += Number(p.total || 0);
-
-        if(dia === 4)
-            jueves += Number(p.total || 0);
-
-        if(dia === 5)
-            viernes += Number(p.total || 0);
-
-        if(dia === 6)
-            sabado += Number(p.total || 0);
-
-    });
-
-    document.getElementById(
-        "detalleReporte"
-    ).innerHTML = `
-
-        <h3>VENTAS DE LA SEMANA</h3>
-
-        <div>Lunes: $${lunes}</div>
-        <div>Martes: $${martes}</div>
-        <div>Miércoles: $${miercoles}</div>
-        <div>Jueves: $${jueves}</div>
-        <div>Viernes: $${viernes}</div>
-        <div>Sábado: $${sabado}</div>
-
-    `;
-}
-
-function mostrarMes(){
-
-    let semana1 = 0;
-    let semana2 = 0;
-    let semana3 = 0;
-    let semana4 = 0;
-    let semana5 = 0;
-
     const hoy = new Date();
+    const fechaHoy = fechaClave(hoy);
+    const total = totalDeFecha(fechaHoy);
+    const ordenesPagadas = pedidosGlobal.filter((pedido) =>
+        pedido.estado === "PAGADA" && pedido.fecha === fechaHoy
+    );
+    const tablaCancelacion = ordenesPagadas.length === 0
+        ? "<p style=\"margin-top:20px;\">No hay órdenes pagadas pendientes de entrega para cancelar hoy.</p>"
+        : `
+            <h3 style="margin-top:24px;">ÓRDENES PAGADAS DE HOY</h3>
+            <div style="font-size:14px; margin-bottom:8px;">Solo las órdenes pagadas y aún no entregadas se pueden cancelar.</div>
+            <table class="tablaReporte" style="max-width:620px;">
+                <thead><tr><th>Orden</th><th>Cliente</th><th>Total</th><th>Acción</th></tr></thead>
+                <tbody>
+                    ${ordenesPagadas.map((pedido) => `
+                        <tr>
+                            <td>${pedido.numeroOrden || "-"}</td>
+                            <td>${pedido.cliente || "-"}</td>
+                            <td>${dinero(pedido.total)}</td>
+                            <td><button class="btnCancelarControl" data-cancelar-pagada="${pedido.id}">CANCELAR</button></td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        `;
 
-    const mesActual = hoy.getMonth();
-    const anioActual = hoy.getFullYear();
-
-    pedidosGlobal.forEach(p => {
-
-        if(
-            p.estado !== "PAGADA" &&
-            p.estado !== "ENTREGADA"
-        ){
-            return;
-        }
-
-        if(!p.fecha){
-            return;
-        }
-
-        const fecha = new Date(p.fecha);
-
-        if(
-            fecha.getMonth() !== mesActual ||
-            fecha.getFullYear() !== anioActual
-        ){
-            return;
-        }
-
-        const diaMes = fecha.getDate();
-
-        if(diaMes <= 7){
-            semana1 += Number(p.total || 0);
-        }
-        else if(diaMes <= 14){
-            semana2 += Number(p.total || 0);
-        }
-        else if(diaMes <= 21){
-            semana3 += Number(p.total || 0);
-        }
-        else if(diaMes <= 28){
-            semana4 += Number(p.total || 0);
-        }
-        else{
-            semana5 += Number(p.total || 0);
-        }
-
-    });
-
-    document.getElementById(
-        "detalleReporte"
-    ).innerHTML = `
-
-        <h3>VENTAS DEL MES</h3>
-
-        <div>Semana 1: $${semana1}</div>
-        <div>Semana 2: $${semana2}</div>
-        <div>Semana 3: $${semana3}</div>
-        <div>Semana 4: $${semana4}</div>
-        <div>Semana 5: $${semana5}</div>
-
+    document.getElementById("detalleReporte").innerHTML = `
+        <h3>DÍA ${nombresDias[hoy.getDay()].toUpperCase()} · ${etiquetaFecha(hoy).toUpperCase()}</h3>
+        <div><strong>Semana ${numeroSemanaISO(hoy)} · ${hoy.getFullYear()}</strong></div>
+        <div style="font-size:22px; font-weight:bold; color:#16a34a; margin-top:10px;">
+            VENTAS DEL DÍA: ${dinero(total)}
+        </div>
+        ${tablaCancelacion}
     `;
+
+    document.querySelectorAll("[data-cancelar-pagada]").forEach((boton) => {
+        boton.onclick = () => cancelarOrdenPagada(boton.dataset.cancelarPagada);
+    });
+}
+
+async function cancelarOrdenPagada(id){
+    const pedido = pedidosGlobal.find((orden) => orden.id === id);
+    if(!pedido || pedido.estado !== "PAGADA"){
+        alert("La orden ya no está disponible para cancelación.");
+        return;
+    }
+
+    if(!confirm(`¿Cancelar la orden ${pedido.numeroOrden || ""} de ${pedido.cliente}? Esta venta dejará de contar en los reportes.`)){
+        return;
+    }
+
+    const respuesta = await fetch(`/api/control/cancelar/${encodeURIComponent(id)}`, { method:"POST" });
+    const resultado = await respuesta.json();
+
+    if(!resultado.ok){
+        alert(resultado.error || "No fue posible cancelar la orden.");
+        return;
+    }
+
+    await cargarHistorial();
+    mostrarDia();
+}
+
+function mostrarSemana(fechaReferencia = new Date(), esAnterior = false){
+    const semana = datosSemana(fechaReferencia);
+    const filas = semana.dias.map((dia) => `
+        <tr>
+            <td>${dia.nombre} ${semana.numero} · ${etiquetaFecha(dia.fecha)}</td>
+            <td>${dinero(dia.total)}</td>
+        </tr>
+    `).join("");
+
+    document.getElementById("detalleReporte").innerHTML = `
+        <h3>${esAnterior ? "SEMANA ANTERIOR" : "SEMANA"} ${semana.numero} · ${semana.anio}</h3>
+        <div>Del ${etiquetaFecha(semana.inicio)} al ${etiquetaFecha(semana.fin)} · Lunes a sábado</div>
+        <table class="tablaReporte">
+            <thead><tr><th>Día</th><th>Ventas</th></tr></thead>
+            <tbody>
+                ${filas}
+                <tr><th>TOTAL SEMANA ${semana.numero}</th><td>${dinero(semana.total)}</td></tr>
+            </tbody>
+        </table>
+    `;
+}
+
+function mostrarMes(fechaReferencia = new Date(), esAnterior = false){
+    const hoy = fechaReferencia;
+    const anio = hoy.getFullYear();
+    const mes = hoy.getMonth();
+    const primero = new Date(anio, mes, 1, 12);
+    const ultimo = new Date(anio, mes + 1, 0, 12);
+    const semanas = [];
+    let lunes = inicioSemana(primero);
+
+    while(lunes <= ultimo){
+        let total = 0;
+        let inicioEnMes = null;
+        let finEnMes = null;
+
+        for(let indice = 0; indice < 6; indice++){
+            const fecha = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() + indice, 12);
+            if(fecha.getFullYear() === anio && fecha.getMonth() === mes){
+                total += totalDeFecha(fechaClave(fecha));
+                inicioEnMes ||= fecha;
+                finEnMes = fecha;
+            }
+        }
+
+        semanas.push({
+            numero: numeroSemanaISO(lunes),
+            inicio: inicioEnMes,
+            fin: finEnMes,
+            total
+        });
+        lunes = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() + 7, 12);
+    }
+
+    const acumulado = semanas.reduce((suma, semana) => suma + semana.total, 0);
+    const filas = semanas.map((semana) => `
+        <tr>
+            <td>Semana ${semana.numero}</td>
+            <td>${etiquetaFecha(semana.inicio)}–${etiquetaFecha(semana.fin)}</td>
+            <td>${dinero(semana.total)}</td>
+        </tr>
+    `).join("");
+
+    document.getElementById("detalleReporte").innerHTML = `
+        <h3>${esAnterior ? "MES ANTERIOR" : "MES"} ${mes + 1} · ${nombresMeses[mes].toUpperCase()} ${anio}</h3>
+        <div><strong>Acumulado mensual (lunes a sábado): ${dinero(acumulado)}</strong></div>
+        <table class="tablaReporte" style="max-width:620px;">
+            <thead><tr><th>Semana</th><th>Periodo</th><th>Ventas</th></tr></thead>
+            <tbody>${filas}</tbody>
+        </table>
+    `;
+}
+
+function mostrarSemanaAnterior(){
+    const semanaAnterior = new Date();
+    semanaAnterior.setDate(semanaAnterior.getDate() - 7);
+    mostrarSemana(semanaAnterior, true);
+}
+
+function mostrarMesAnterior(){
+    const hoy = new Date();
+    const mesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1, 12);
+    mostrarMes(mesAnterior, true);
 }
 mostrarDia();
 
